@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Antrian Pasien</title>
+
+    <!-- BOOTSTRAP 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- BOOTSTRAP ICONS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        .status { padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; }
+        .status.wait { background: #ffebd2; color: #d48b18; }
+        .status.call { background: #d6f3ff; color: #1d82b5; }
+        .status.done { background: #d5ffd9; color: #2a8c3a; }
+
+        /* Floating Chat Button */
+        .chat-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background: #0d6efd;
+            color: white;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.25);
+            cursor: pointer;
+            z-index: 999;
+        }
+        .chat-btn:hover { background: #0b5ed7; }
+
+        /* Popup Chat */
+        .chat-popup {
+            position: fixed;
+            bottom: 95px;
+            right: 25px;
+            width: 330px;
+            height: 450px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        .chat-header {
+            background: #0d6efd;
+            color: white;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        .chat-body {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        .chat-message {
+            background: #fff;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 10px;
+            font-size: 14px;
+            max-width: 85%;
+        }
+        .chat-input {
+            border-top: 1px solid #ddd;
+            padding: 10px;
+            background: #fff;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <!-- Header -->
+    <nav class="navbar bg-white shadow-sm p-3 mb-4">
+        <div class="container-fluid d-flex justify-content-between">
+            <h4 class="m-0">Dashboard Antrian Pasien</h4>
+            <span class="text-muted">SmartHealth Queue System</span>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- SUMMARY CARDS -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card shadow-sm p-3">
+                    <h5>Total Pasien Menunggu</h5>
+                    <div class="fs-1 fw-bold text-primary">42</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm p-3">
+                    <h5>Sedang Dilayani</h5>
+                    <div class="fs-1 fw-bold text-primary">5</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm p-3">
+                    <h5>Rata-rata Waktu Tunggu</h5>
+                    <div class="fs-1 fw-bold text-primary">18 Menit</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm p-3">
+                    <h5>Next Call</h5>
+                    <div class="fs-1 fw-bold text-primary">A021</div>
+                    <button class="btn btn-primary w-100 mt-3">PANGGIL</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANTRIAN PER POLI -->
+        <h4 class="mb-3">Antrian Per Poli</h4>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3"><div class="card shadow-sm p-3"><h5>Poli Umum</h5><div class="fs-1 fw-bold text-primary">12</div></div></div>
+            <div class="col-md-3"><div class="card shadow-sm p-3"><h5>Poli Anak</h5><div class="fs-1 fw-bold text-primary">8</div></div></div>
+            <div class="col-md-3"><div class="card shadow-sm p-3"><h5>Poli Gigi</h5><div class="fs-1 fw-bold text-primary">15</div></div></div>
+            <div class="col-md-3"><div class="card shadow-sm p-3"><h5>Poli Kandungan</h5><div class="fs-1 fw-bold text-primary">7</div></div></div>
+        </div>
+
+        <!-- TABLE ANTRIAN -->
+        <div class="card shadow-sm mb-5">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Daftar Antrian Hari Ini</h4>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Pasien</th>
+                                <th>Poli</th>
+                                <th>Status</th>
+                                <th style="width: 160px;">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>A018</td>
+                                <td>Budi Santoso</td>
+                                <td>Umum</td>
+                                <td><span class="status wait">Menunggu</span></td>
+                                <td><button class="btn btn-primary btn-sm">Panggil</button> <button class="btn btn-danger btn-sm">Lewati</button></td>
+                            </tr>
+
+                            <tr>
+                                <td>A019</td>
+                                <td>Lestari</td>
+                                <td>Gigi</td>
+                                <td><span class="status call">Dipanggil</span></td>
+                                <td><button class="btn btn-primary btn-sm">Panggil</button> <button class="btn btn-danger btn-sm">Lewati</button></td>
+                            </tr>
+
+                            <tr>
+                                <td>A020</td>
+                                <td>Rahmat Hidayat</td>
+                                <td>Anak</td>
+                                <td><span class="status done">Selesai</span></td>
+                                <td> - </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- POPUP CHAT -->
+    <div class="chat-popup" id="chatPopup">
+        <div class="chat-header">
+            <span>Chat Bantuan</span>
+            <button class="btn btn-sm btn-light" id="closeChat"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <div class="chat-body" id="chatBody">
+            <div class="chat-message">Halo! Ada yang bisa kami bantu?</div>
+        </div>
+
+        <div class="chat-input">
+            <div class="input-group">
+                <input type="text" class="form-control" id="chatInput" placeholder="Ketik pesan...">
+                <button class="btn btn-primary" id="sendChat"><i class="bi bi-send"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING CHAT BUTTON -->
+    <button class="chat-btn" id="openChat" title="Chat Bantuan">
+        <i class="bi bi-chat-dots"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const chatPopup = document.getElementById("chatPopup");
+        const openChat = document.getElementById("openChat");
+        const closeChat = document.getElementById("closeChat");
+        const sendBtn = document.getElementById("sendChat");
+        const chatInput = document.getElementById("chatInput");
+        const chatBody = document.getElementById("chatBody");
+
+        openChat.addEventListener("click", () => chatPopup.style.display = "flex");
+        closeChat.addEventListener("click", () => chatPopup.style.display = "none");
+
+        sendBtn.addEventListener("click", sendChatMessage);
+
+        function sendChatMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            const msg = document.createElement("div");
+            msg.classList.add("chat-message");
+            msg.textContent = text;
+
+            chatBody.appendChild(msg);
+            chatInput.value = "";
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    </script>
+
+</body>
+</html>
