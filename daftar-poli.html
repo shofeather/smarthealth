@@ -1056,6 +1056,24 @@
                           <option value="Poli Lansia">Poli Lansia</option>
                         </select>
                       </div>
+                      <div class="mb-3">
+                        <label class="form-label"
+                          >Pilih Tanggal Pemeriksaan</label
+                        >
+
+                        <div
+                          class="d-flex gap-3 flex-nowrap overflow-auto pb-2"
+                          id="datePicker"
+                        >
+                          <!-- JavaScript akan mengisi card -->
+                        </div>
+
+                        <input
+                          type="hidden"
+                          name="selected_date"
+                          id="selectedDate"
+                        />
+                      </div>
                       <div class="mb-6">
                         <label
                           class="form-label"
@@ -1354,6 +1372,64 @@ Jl. A H Nasution No. 14, Jatihandap, Antapani Bandung</textarea
         chatInput.value = "";
         chatBody.scrollTop = chatBody.scrollHeight;
       }
+    </script>
+
+    <script>
+      const quotaData = {
+        "2025-11-20": 58,
+        "2025-11-21": 4,
+        "2025-11-22": 2,
+        "2025-11-23": 10,
+        "2025-11-24": 12,
+        "2025-11-25": 13,
+      };
+
+      function renderDateCards() {
+        const container = document.getElementById("datePicker");
+        container.innerHTML = "";
+
+        const today = new Date();
+
+        for (let i = 0; i < 7; i++) {
+          const d = new Date();
+          d.setDate(today.getDate() + i);
+
+          const dayName = d.toLocaleDateString("id-ID", { weekday: "long" });
+          const dayNumber = d.getDate();
+          const monthYear = d.toLocaleDateString("id-ID", {
+            month: "long",
+            year: "numeric",
+          });
+
+          const dateKey = d.toISOString().split("T")[0];
+          const quota = quotaData[dateKey] ?? 0;
+
+          const card = `
+      <div class="card p-2 text-center select-date" data-date="${dateKey}" style="min-width:130px; cursor:pointer;">
+        <div class="small fw-semibold">${dayName}</div>
+        <div class="fw-bold fs-1">${dayNumber}</div>
+        <div class="fw-bold">Kuota : ${quota}</div>
+        <div class="small">${monthYear}</div>
+      </div>
+    `;
+
+          container.innerHTML += card;
+        }
+      }
+
+      document.addEventListener("click", function (e) {
+        const card = e.target.closest(".select-date");
+        if (!card) return;
+
+        document.querySelectorAll(".select-date").forEach((c) => {
+          c.classList.remove("border-primary");
+        });
+
+        card.classList.add("border", "border-primary");
+        document.getElementById("selectedDate").value = card.dataset.date;
+      });
+
+      renderDateCards();
     </script>
   </body>
 </html>
