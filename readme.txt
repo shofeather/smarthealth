@@ -68,4 +68,4 @@ cd nama-folder-project
 Tulis daftar developer atau kontributor di sini.
 Ahmad Shofi
 Pengembang Sistem SmartHealth
-GitHub: @shofeather
+GitHub: @shofeather, @binarch9-maker
